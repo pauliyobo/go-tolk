@@ -4,8 +4,10 @@ go-tolk is a wrapper over the DLL of the Tolk library which allows an applicatio
 * This wrapper does not statically link with tolk.dll but uses syscall to call the library functions.
 * this wrapper makes call to a dynamic link library (DLL) that is compiled for 32bit systems
 If you have a 64bit go compiler you'll have to do the following for successfully using the wrapper
+```batch
 set GOARCH=386
 set GOOS=windows even though it should already be
+```
 ## Usage
 ```go
 package main
