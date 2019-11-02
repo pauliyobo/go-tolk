@@ -17,8 +17,7 @@ import (
 	"fmt"
 )
 
-func main()
-{
+func main() {
 	err : = Tolk.Load()
 	if err != nil {
 		fmt.Println("Tolk loaded successfully")
