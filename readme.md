@@ -41,5 +41,5 @@ N V D A
 ## todo
 * Improving documentation
 * Additionally generating documentation with godoc
-## contributings
+## contributing
 Pull requests are welcome
