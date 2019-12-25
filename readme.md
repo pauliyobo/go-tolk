@@ -1,6 +1,7 @@
 # go-tolk
 [godoc](https://godoc.org/github.com/pauliyobo/go-tolk)
-go-tolk is a wrapper over the DLL of the Tolk library which allows an application to communicate with the user's screenreader
+
+Go-tolk is a wrapper over the DLL of the Tolk library which allows an application to communicate with the user's screenreader
 ## Notes
 * This wrapper does not statically link with tolk.dll but uses syscall to call the library functions.
 * this wrapper makes call to a dynamic link library (DLL) that is compiled for 32bit systems
