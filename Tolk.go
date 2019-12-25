@@ -1,103 +1,76 @@
-package Tolk
+package tolk
 import (
+	"fmt"
 	"syscall"
 	"unsafe"
+	"strings"
 )
 
-var 		lib = syscall.NewLazyDLL("Tolk.dll")
+var lib = syscall.NewLazyDLL("Tolk.dll")
 var loaded = false
 
-func Load() error {
+
+// Load loads the library
+//
+// This function must be the first to be called when working with with tolk
+func Load() {
 	if loaded == false {
-		_, _, err := lib.NewProc("Tolk_Load").Call()
-		if err != nil {
-			return err
-		}
-		loaded = true
+		lib.NewProc("Tolk_Load").Call()
 	}
-	return nil
+	loaded = true	
 }
 
+// Unload must be called after all the operations with library are finished
 func Unload() error {
 	if loaded == true {
-		_, _, err := lib.NewProc("Tolk_Unload").Call()
-		if err != nil {
-			return err
-		}
+		lib.NewProc("Tolk_Unload").Call()
 	}
 	return nil
 }
 
-func TrySapi(sapi bool) error {
-	_, _, err := lib.NewProc("Tolk_TrySAPI").Call(BoolToUintptr(sapi))
-	if err != nil {
-		return err
-	}
-	return nil
+func TrySapi(sapi bool) {
+	lib.NewProc("Tolk_TrySAPI").Call(BoolToUintptr(sapi))
 }
 
-func PreferSapi(sapi bool) error {
-	_, _, err := lib.NewProc("Tolk_PreferSAPI").Call(BoolToUintptr(sapi))
-	if err != nil {
-		return err
-	}
-	return nil
+func PreferSapi(sapi bool) {
+	lib.NewProc("Tolk_PreferSAPI").Call(BoolToUintptr(sapi))
 }
 
-func DetectScreenReader() (string, error) {
-	ret, _, err := lib.NewProc("Tolk_DetectScreenReader").Call()
-	if err != nil {
-		return "", err
-	}
-	return CharPToString(ret), nil
+// DetectScreenReader will try to detect the current screenreader that is running on your computer
+func DetectScreenReader() string {
+	ret, _, _ := lib.NewProc("Tolk_DetectScreenReader").Call()
+	// replacing spaces with nothing because for some reason the letters are returned with a space between them
+	return strings.ReplaceAll(CharPToString(ret), string(0), "")
 }
 
-func HasSpeech() (bool, error) {
-	ret, _, err := lib.NewProc("Tolk_HasSpeech").Call()
-	if err != nil {
-		return false, err
-	}
-	return UintptrToBool(ret), nil
+func HasSpeech() bool {
+	ret, _, _ := lib.NewProc("Tolk_HasSpeech").Call()
+	return UintptrToBool(ret)
 }
 
-func HasBraille() (bool, error) {
-	ret, _, err := lib.NewProc("Tolk_HasBraille").Call()
-	if err != nil {
-		return false, err
-	}
-	return UintptrToBool(ret), nil
+func HasBraille() bool {
+	ret, _, _ := lib.NewProc("Tolk_HasBraille").Call()
+	return UintptrToBool(ret)
 }
 
-func Output(text string, interrupt bool) (bool, error) {
-	ret, _, err := lib.NewProc("Tolk_Output").Call(StringToUintptr(text), BoolToUintptr(interrupt))
-	if err != nil {
-		return false, err
-	}
-	return UintptrToBool(ret), nil
+func Output(text string, interrupt bool) bool {
+	ret, _, _ := lib.NewProc("Tolk_Output").Call(StringToUintptr(text), BoolToUintptr(interrupt))
+	return UintptrToBool(ret)
 }
 
-func Speak(text string, interrupt bool) (bool, error) {
-	ret, _, err := lib.NewProc("Tolk_Speak").Call(StringToUintptr(text), BoolToUintptr(interrupt))
-	if err != nil {
-		return false, err
-	}
-	return UintptrToBool(ret), nil
+func Speak(text string, interrupt bool) bool {
+	ret, _, _ := lib.NewProc("Tolk_Speak").Call(StringToUintptr(text), BoolToUintptr(interrupt))
+	return UintptrToBool(ret)
 }
 
-func Braille(text string) (bool, error) {
-	ret, _, err := lib.NewProc("Tolk_Braille").Call(StringToUintptr(text))
-	if err != nil {
-		return false, err
-	}
-	return UintptrToBool(ret), nil
+func Braille(text string) bool {
+	ret, _, _ := lib.NewProc("Tolk_Braille").Call(StringToUintptr(text))
+	return UintptrToBool(ret)
 }
 
-func Silence() (bool, error) {
-	ret, _, err := lib.NewProc("Tolk_Output").Call()
-	if err != nil {
-		return false, err
-	}
-	return UintptrToBool(ret), nil
+func Silence() bool {
+	ret, _, _ := lib.NewProc("Tolk_Output").Call()
+	return UintptrToBool(ret)
 }
 
 func CharPToString(u uintptr) string {
@@ -124,4 +97,12 @@ func BoolToUintptr(v bool) uintptr {
 
 func UintptrToBool(v uintptr) bool {
 	return v != 0
+}
+
+func main() {
+	Load()
+	sr := DetectScreenReader()
+	fmt.Println(sr)
+	//Output(sr, false)
+	Unload()
 }

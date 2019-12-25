@@ -13,7 +13,7 @@ set GOOS=windows even though it should already be
 package main
 
 import (
-	"Tolk"
+	"tolk"
 	"fmt"
 )
 
