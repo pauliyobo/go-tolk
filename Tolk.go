@@ -1,9 +1,9 @@
 package tolk
 import (
+	"C"
 	"fmt"
 	"syscall"
 	"unsafe"
-	"strings"
 )
 
 var lib = syscall.NewLazyDLL("Tolk.dll")
@@ -39,8 +39,7 @@ func PreferSapi(sapi bool) {
 // DetectScreenReader will try to detect the current screenreader that is running on your computer
 func DetectScreenReader() string {
 	ret, _, _ := lib.NewProc("Tolk_DetectScreenReader").Call()
-	// replacing spaces with nothing because for some reason the letters are returned with a space between them
-	return strings.ReplaceAll(CharPToString(ret), string(0), "")
+	return CharPToString(ret)
 }
 
 func HasSpeech() bool {
@@ -74,7 +73,9 @@ func Silence() bool {
 }
 
 func CharPToString(u uintptr) string {
-	return string((*[unsafe.Sizeof(u)*2]byte)(unsafe.Pointer(u))[:])
+	ptr := (*C.Char)(unsafe.Pointer(u)
+	str := C.GoString(ptr)
+	return str
 }
 
 func StringToUintptr(s string) uintptr {
